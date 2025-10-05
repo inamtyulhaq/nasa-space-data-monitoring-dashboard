@@ -1,0 +1,29 @@
+# json_exporter_donki.yaml
+
+servers:
+  - name: donki
+    host: 0.0.0.0
+    port: 7979
+    metrics_path: /metrics
+
+scrape_configs:
+  - job_name: nasa_donki_flr
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "https://api.nasa.gov/DONKI/FLR?startDate=2025-10-01&endDate=2025-10-05&api_key=here-was-my-original-api-key"
+    metrics:
+      - name: flr_events_total
+        type: gauge
+        help: "Total number of NASA FLR events returned by DONKI API"
+        value_path: "$.length()"
+
+      - name: flr_peak_class
+        type: gauge
+        help: "Peak class of each solar flare event (M1.2, M1.5, etc.)"
+        value_path: "$[*].classType"
+        labels:
+          flr_id: "$[*].flrID"
+          region: "$[*].sourceLocation"
+          ar_num: "$[*].activeRegionNum"
+          link: "$[*].link"
